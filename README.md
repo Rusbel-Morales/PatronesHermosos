@@ -25,4 +25,4 @@ Participo como **administrador de base de datos** y **desarrollador backend** (`
   - Convocatoria firmada por la sede.
 - Backend funcional para el registro y almacenamiento de datos.
 
-> 📄 Para conocer más sobre la estructura y construcción del backend, consulta la documentación técnica disponible en la carpeta [`/docs`](./docs).
+> 📄 Para conocer más sobre la estructura y construcción del backend, consulta la documentación técnica disponible en la carpeta(.ph-backend/docs).
