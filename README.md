@@ -2,27 +2,55 @@
 
 **Desarrollo Web – Proyecto en curso (FJ2025)**
 
-**Patrones Hermosos** es una aplicación web actualmente en desarrollo como parte del Bootcamp del mismo nombre. Este programa busca cerrar la brecha de género e impulsar la participación de mujeres en STEM. Este proyecto representa una oportunidad valiosa para aplicar buenas prácticas de estructuración de código, basadas en experiencias de proyectos anteriores. Representa un sistema de gestión para mantener el control del campamento en un solo lugar, abarcando aspectos como gestión de sedes, colaboradoras, participantes, así como la automatización de generación de diplomas para aquellos que finalizaron el Bootcamp.
+**Patrones Hermosos** es una aplicación web en desarrollo como parte del Bootcamp del mismo nombre, cuyo objetivo es cerrar la brecha de género e impulsar la participación de mujeres en áreas STEM. El sistema está diseñado para centralizar la gestión del campamento, abarcando el control de sedes, colaboradoras, participantes, así como la automatización de diplomas para quienes finalizan exitosamente el programa.
 
 ## 👩‍💻 Rol en el proyecto
 
-Participo como **administrador de base de datos** y **desarrollador backend** (`ph-backend`). Mis responsabilidades incluyen la implementación de la lógica del servidor, gestión de la base de datos y conexión con servicios de almacenamiento en la nube.
+Participo como:
+
+- **Administrador de base de datos**
+- **Desarrollador backend** (`ph-backend`)
+
+Mis responsabilidades incluyen:
+
+- Implementación de la lógica del servidor.
+- Diseño y mantenimiento de la base de datos.
+- Conexión con servicios de almacenamiento en la nube y autenticación.
 
 ## 🛠️ Tecnologías utilizadas
 
-- **Node.js** y **Express.js** para el desarrollo del backend.
-- **PostgreSQL** como sistema de gestión de base de datos relacional.
-- **Supabase** como cliente para almacenamiento en la nube y autenticación.
+- **Node.js** y **Express.js** – Desarrollo del backend.
+- **PostgreSQL** – Sistema de gestión de base de datos relacional.
+- **Supabase** – Cliente para almacenamiento en la nube y autenticación.
+- **React** – Librería para construcción de componentes frontend.
+- **Chakra UI** – Conjunto de componentes de interfaz adaptados a React.
 
 ## 🚀 Funcionalidades actuales
 
 - Registro de participantes con asignación de tutores.
-- Registro de colaboradoras.
-- Registro de sedes.
-- Gestión de sedes, donde podemos verificar el registro e integrarla como sede del campamento.
-- Subida de archivos para:
-  - Permiso del tutor.
-  - Convocatoria firmada por la sede.
-- Backend funcional para el registro y almacenamiento de datos.
+- Registro y administración de colaboradoras.
+- Gestión y validación de sedes como anfitrionas del campamento.
+- Subida y almacenamiento de archivos requeridos:
+  - Permiso firmado por tutor.
+  - Convocatoria firmada por sede.
+- Generación automática de diplomas para:
+  - Coordinadoras de sede
+  - Participantes
+  - Colaboradoras
+  - Mentoras
+- Creación y gestión de grupos.
+- Integración de usuarios disponibles en grupos.
+- Visualización de solicitudes y archivos en PDF.
+- Exportación de estadísticas en formato Excel.
+- Inicio y cierre de sesión seguro con control de sesión.
+- Backend funcional para registro, almacenamiento y consulta de datos.
 
-> 📄 Para conocer más sobre la estructura y construcción del backend, consulta la documentación técnica disponible en la carpeta: [ph-backend/docs](ph-backend/docs).
+> 📄 Para más detalles sobre la arquitectura y funcionamiento del backend, consulta la documentación técnica en la carpeta: [ph-backend/docs](ph-backend/docs)
+
+## 👥 Autores del proyecto
+
+- **Rusbel Alejandro Morales Méndez** – [GitHub](#) *(este perfil)*
+- **Diego Javier Solórzano Trinidad** – [GitHub](#)
+- **Jonathan Armando Arredondo Hernández** – [GitHub](#)
+- **Gadiro Cano Sánchez** – [GitHub](#)
+- **Pablo André Coca Murillo** – [GitHub](#)

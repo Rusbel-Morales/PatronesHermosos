@@ -22,4 +22,8 @@ function transformNamePermisoTutor(nombre_permiso_tutor) {
     return nombre_permiso_tutor.toUpperCase().normalize('NFD').replace(/[\u0300-\u036f]/g, "").split(" ").join("-") + ext; // Formato: nombre-permiso-tutor
 }
 
-module.exports = { uniqueFileName, transformNameSede, transformNamePermisoTutor };
+module.exports = { 
+    uniqueFileName, 
+    transformNameSede, 
+    transformNamePermisoTutor 
+};

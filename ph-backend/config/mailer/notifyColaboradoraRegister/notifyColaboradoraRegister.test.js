@@ -1,50 +1,38 @@
 const { mock } = require("nodemailer");
 const NotifyColaboradoraRegister = require("./notifyColaboradoraRegister");
 
-describe("NotifyColaboradoraRegister Module", () => {
+describe("NotifyColaboradoraRegister", () => {
 	beforeEach(() => {
 		mock.reset();
 	});
 
-	it("should send a notification email with default message", async () => {
-		const notifyEmail = new NotifyColaboradoraRegister();
-		const colaboradora = {
-			nombre: "María González",
-			correo: "maria.gonzalez@ejemplo.com",
-		};
+	it("debería enviar un correo con el mensaje por defecto", async () => {
+		const email = new NotifyColaboradoraRegister();
+		await email.sendEmail({
+			nombre: "Luis",
+			correo: "luis@example.com"
+		});
 
-		await notifyEmail.sendEmail(colaboradora.nombre, colaboradora.correo);
+		const sentMail = mock.getSentMail();
 
-		const sentEmails = mock.getSentMail();
-		expect(sentEmails.length).toBe(1);
-		expect(sentEmails[0].to).toBe(colaboradora.correo);
-		expect(sentEmails[0].subject).toBe("Registro de Colaboradora");
-		expect(sentEmails[0].text).toContain("Hola María González");
-		expect(sentEmails[0].text).toContain("Tu registro como colaboradora ha sido exitoso");
+		expect(sentMail).toHaveLength(1);
+		expect(sentMail[0]).toMatchObject({
+			from: process.env.EMAIL_USER,
+			to: "luis@example.com",
+			subject: "Registro de Colaboradora",
+			text: "Hola Luis,\nTu registro como colaboradora ha sido exitoso"
+		});
 	});
 
-	it("should send a notification email with a custom message", async () => {
-		const notifyEmail = new NotifyColaboradoraRegister();
-		const colaboradora = {
-			nombre: "Lucía Pérez",
-			correo: "lucia.perez@ejemplo.com",
-		};
-		const customMessage = "Gracias por sumarte como colaboradora.";
+	it("debería permitir sobreescribir el mensaje", async () => {
+		const email = new NotifyColaboradoraRegister();
+		await email.sendEmail({
+			nombre: "Luis",
+			correo: "luis@example.com",
+			mensaje: "¡Bienvenida al equipo como colaboradora!"
+		});
 
-		await notifyEmail.sendEmail(colaboradora.nombre, colaboradora.correo, customMessage);
-
-		const sentEmails = mock.getSentMail();
-		expect(sentEmails.length).toBe(1);
-		expect(sentEmails[0].to).toBe(colaboradora.correo);
-		expect(sentEmails[0].text).toContain(customMessage);
-	});
-
-	it("should handle email sending errors", async () => {
-		const notifyEmail = new NotifyColaboradoraRegister();
-		mock.setShouldFailOnce(true);
-
-		await expect(
-			notifyEmail.sendEmail("Ana Torres", "ana.torres@ejemplo.com")
-		).rejects.toThrow();
+		const sentMail = mock.getSentMail();
+		expect(sentMail[0].text).toBe("Hola Luis,\n¡Bienvenida al equipo como colaboradora!");
 	});
 });

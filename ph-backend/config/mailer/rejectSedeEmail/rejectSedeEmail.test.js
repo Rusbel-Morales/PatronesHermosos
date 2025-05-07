@@ -1,50 +1,38 @@
 const { mock } = require("nodemailer");
 const RejectSedeEmail = require("./rejectSedeEmail");
 
-describe("RejectSedeEmail Module", () => {
+describe("RejectSedeEmail", () => {
 	beforeEach(() => {
 		mock.reset();
 	});
 
-	it("should send a sede rejection email with default message", async () => {
-		const rejectEmail = new RejectSedeEmail();
-		const sede = {
-			nombre: "Casa Cultural Sur",
-			correo: "casacultural@ejemplo.com",
-		};
+	it("debería enviar un correo con el mensaje por defecto", async () => {
+		const email = new RejectSedeEmail();
+		await email.sendEmail({
+			nombre: "Luis",
+			correo: "luis@example.com"
+		});
 
-		await rejectEmail.sendEmail(sede.nombre, sede.correo);
+		const sentMail = mock.getSentMail();
 
-		const sentEmails = mock.getSentMail();
-		expect(sentEmails.length).toBe(1);
-		expect(sentEmails[0].to).toBe(sede.correo);
-		expect(sentEmails[0].subject).toBe("Rechazo de Sede");
-		expect(sentEmails[0].text).toContain("Hola Casa Cultural Sur");
-		expect(sentEmails[0].text).toContain("Tu sede ha sido rechazada");
+		expect(sentMail).toHaveLength(1);
+		expect(sentMail[0]).toMatchObject({
+			from: process.env.EMAIL_USER,
+			to: "luis@example.com",
+			subject: "Rechazo de Sede",
+			text: "Hola Luis,\nTu sede ha sido rechazada"
+		});
 	});
 
-	it("should send a sede rejection email with a custom message", async () => {
-		const rejectEmail = new RejectSedeEmail();
-		const sede = {
-			nombre: "Espacio Comunal Norte",
-			correo: "espaciocomunal@ejemplo.com",
-		};
-		const customMessage = "Lamentablemente tu sede no fue seleccionada en esta edición.";
+	it("debería permitir sobreescribir el mensaje", async () => {
+		const email = new RejectSedeEmail();
+		await email.sendEmail({
+			nombre: "Luis",
+			correo: "luis@example.com",
+			mensaje: "Hemos revisado tu sede y no cumple con los requisitos mínimos."
+		});
 
-		await rejectEmail.sendEmail(sede.nombre, sede.correo, customMessage);
-
-		const sentEmails = mock.getSentMail();
-		expect(sentEmails.length).toBe(1);
-		expect(sentEmails[0].to).toBe(sede.correo);
-		expect(sentEmails[0].text).toContain(customMessage);
-	});
-
-	it("should handle email sending errors", async () => {
-		const rejectEmail = new RejectSedeEmail();
-		mock.setShouldFailOnce(true);
-
-		await expect(
-			rejectEmail.sendEmail("Red Comunitaria", "red@ejemplo.com")
-		).rejects.toThrow();
+		const sentMail = mock.getSentMail();
+		expect(sentMail[0].text).toBe("Hola Luis,\nHemos revisado tu sede y no cumple con los requisitos mínimos.");
 	});
 });

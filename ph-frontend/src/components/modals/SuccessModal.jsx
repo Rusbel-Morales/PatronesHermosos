@@ -1,6 +1,6 @@
 // SuccessModal.jsx
 // Modal de éxito que se muestra cuando una operación se realiza correctamente.
-
+import { motion } from "framer-motion";  // Importa motion
 import { ImCheckmark } from "react-icons/im";
 import {
     Center,
@@ -29,9 +29,11 @@ const SuccessModal = ({ isOpen, onClose, message }) => {
             <Portal>
                 <Dialog.Backdrop />
                 <Dialog.Positioner>
-                    <Dialog.Content>
+                    <Dialog.Content 
+                    w="70vw"
+                    h="40vh">
                         {/* Icono de éxito con animación */}
-                        <Center bg="white" h="120px">
+                        <Center bg="withe" h="13vh"  color="white">
                             <motion.div
                                 initial={{ scale: 0, rotate: -180, opacity: 0 }}
                                 animate={{ scale: 1, rotate: 0, opacity: 1 }}
@@ -42,17 +44,17 @@ const SuccessModal = ({ isOpen, onClose, message }) => {
                         </Center>
 
                         {/* Contenido del modal */}
-                        <Center bg="white" h="40px">
-                            <Dialog.Header fontSize="4xl" color="black" fontWeight="bold">
+                        <Center bg="white" h="5vh" color="white">
+                            <Dialog.Header fontSize="2xl" color="black" fontWeight="bold">
                                 Éxito
                             </Dialog.Header>
                         </Center>
 
                         <Dialog.Body fontSize="lg">
                             <Center
-                                fontSize="xl"
+                                fontSize="1xl"
                                 bg="white"
-                                h="60px"
+                                h="7vh"
                                 textAlign="center"
                                 paddingY="10"
                             >
@@ -66,10 +68,10 @@ const SuccessModal = ({ isOpen, onClose, message }) => {
                                 <Button
                                     onClick={onClose}
                                     colorPalette={"purple"}
-                                    width="100%"
-                                    fontSize="2xl"
-                                    paddingX="20"
-                                    paddingY="4"
+                                    width="12vw"
+                                    height="5vh"
+                                    fontSize="sm"
+                                   
                                 >
                                     Cerrar
                                 </Button>

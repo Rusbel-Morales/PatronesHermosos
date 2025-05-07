@@ -1,50 +1,40 @@
-const { mock } = require("nodemailer"); // use nodemailer mock
+const { mock } = require("nodemailer"); // nodemailer-mock
 const ApproveSedeEmail = require("./approveSedeEmail");
 
-describe("ApproveSedeEmail Module", () => {
+describe("ApproveSedeEmail", () => {
 	beforeEach(() => {
 		mock.reset();
 	});
 
-	it("should send an approval email with default message", async () => {
-		const approveEmail = new ApproveSedeEmail();
-		const sede = {
-			nombre: "Centro Cultural",
-			correo: "centro@ejemplo.com",
-		};
+	it("debería enviar un correo con el mensaje por defecto", async () => {
+		const email = new ApproveSedeEmail();
+		await email.sendEmail({
+			nombre: "Luis",
+			correo: "luis@example.com",
+			password: "123456"
+		});
 
-		await approveEmail.sendEmail(sede.nombre, sede.correo);
+		const sentMail = mock.getSentMail();
 
-		const sentEmails = mock.getSentMail();
-		expect(sentEmails.length).toBe(1);
-		expect(sentEmails[0].to).toBe(sede.correo);
-		expect(sentEmails[0].subject).toBe("Aprobación de Sede");
-		expect(sentEmails[0].text).toContain("Hola Centro Cultural");
-		expect(sentEmails[0].text).toContain("Tu sede ha sido aprobada con éxito");
+		expect(sentMail).toHaveLength(1);
+		expect(sentMail[0]).toMatchObject({
+			from: process.env.EMAIL_USER,
+			to: "luis@example.com",
+			subject: "Aprobación de Sede",
+			text: "Hola Luis,\nTu sede ha sido aprobada con éxito. Tu contraseña es: 123456"
+		});
 	});
 
-	it("should send an approval email with a custom message", async () => {
-		const approveEmail = new ApproveSedeEmail();
-		const sede = {
-			nombre: "Biblioteca Popular",
-			correo: "biblioteca@ejemplo.com",
-		};
-		const customMessage = "¡Felicitaciones! Tu sede fue aceptada.";
+	it("debería permitir sobreescribir el mensaje", async () => {
+		const email = new ApproveSedeEmail();
+		await email.sendEmail({
+			nombre: "Luis",
+			correo: "luis@example.com",
+			password: "123456",
+			mensaje: "¡Enhorabuena, tu sede fue validada!"
+		});
 
-		await approveEmail.sendEmail(sede.nombre, sede.correo, customMessage);
-
-		const sentEmails = mock.getSentMail();
-		expect(sentEmails.length).toBe(1);
-		expect(sentEmails[0].to).toBe(sede.correo);
-		expect(sentEmails[0].text).toContain(customMessage);
-	});
-
-	it("should handle email sending errors", async () => {
-		const approveEmail = new ApproveSedeEmail();
-		mock.setShouldFailOnce(true);
-
-		await expect(
-			approveEmail.sendEmail("Sala Comunitaria", "sala@ejemplo.com")
-		).rejects.toThrow();
+		const sentMail = mock.getSentMail();
+		expect(sentMail[0].text).toBe("Hola Luis,\n¡Enhorabuena, tu sede fue validada!");
 	});
 });

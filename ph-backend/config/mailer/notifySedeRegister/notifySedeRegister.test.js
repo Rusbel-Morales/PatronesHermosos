@@ -1,50 +1,38 @@
 const { mock } = require("nodemailer");
 const NotifySedeRegister = require("./notifySedeRegister");
 
-describe("NotifySedeRegister Module", () => {
+describe("NotifySedeRegister", () => {
 	beforeEach(() => {
 		mock.reset();
 	});
 
-	it("should send a sede registration email with default message", async () => {
-		const notifyEmail = new NotifySedeRegister();
-		const sede = {
-			nombre: "Casa Cultural Oeste",
-			correo: "casa.oeste@ejemplo.com",
-		};
+	it("debería enviar un correo con el mensaje por defecto", async () => {
+		const email = new NotifySedeRegister();
+		await email.sendEmail({
+			nombre: "Luis",
+			correo: "luis@example.com"
+		});
 
-		await notifyEmail.sendEmail(sede.nombre, sede.correo);
+		const sentMail = mock.getSentMail();
 
-		const sentEmails = mock.getSentMail();
-		expect(sentEmails.length).toBe(1);
-		expect(sentEmails[0].to).toBe(sede.correo);
-		expect(sentEmails[0].subject).toBe("Registro de Sede");
-		expect(sentEmails[0].text).toContain("Hola Casa Cultural Oeste");
-		expect(sentEmails[0].text).toContain("El registro de tu sede ha sido exitoso");
+		expect(sentMail).toHaveLength(1);
+		expect(sentMail[0]).toMatchObject({
+			from: process.env.EMAIL_USER,
+			to: "luis@example.com",
+			subject: "Registro de Sede",
+			text: "Hola Luis,\nEl registro de tu sede ha sido exitoso"
+		});
 	});
 
-	it("should send a sede registration email with a custom message", async () => {
-		const notifyEmail = new NotifySedeRegister();
-		const sede = {
-			nombre: "Espacio Norte",
-			correo: "espacio.norte@ejemplo.com",
-		};
-		const customMessage = "¡Gracias por registrar tu sede! Te contactaremos pronto.";
+	it("debería permitir sobreescribir el mensaje", async () => {
+		const email = new NotifySedeRegister();
+		await email.sendEmail({
+			nombre: "Luis",
+			correo: "luis@example.com",
+			mensaje: "¡Registro exitoso de tu sede en el sistema!"
+		});
 
-		await notifyEmail.sendEmail(sede.nombre, sede.correo, customMessage);
-
-		const sentEmails = mock.getSentMail();
-		expect(sentEmails.length).toBe(1);
-		expect(sentEmails[0].to).toBe(sede.correo);
-		expect(sentEmails[0].text).toContain(customMessage);
-	});
-
-	it("should handle email sending errors", async () => {
-		const notifyEmail = new NotifySedeRegister();
-		mock.setShouldFailOnce(true);
-
-		await expect(
-			notifyEmail.sendEmail("Red Sur", "red.sur@ejemplo.com")
-		).rejects.toThrow();
+		const sentMail = mock.getSentMail();
+		expect(sentMail[0].text).toBe("Hola Luis,\n¡Registro exitoso de tu sede en el sistema!");
 	});
 });

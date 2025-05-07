@@ -16,7 +16,7 @@ const SedeModel = {
 	 */
 
 	async createSede(sede) {
-		const { data, error } = await supabase
+		const {data, error} = await supabase
 			.from("sede")
 			.insert(sede)
 			.select(`id_sede`)
@@ -29,7 +29,7 @@ const SedeModel = {
 		return data;
 	},
 	async enviarConvocatoria(nombre_sede_transformado, file_pdf) {
-		const { data, error } = await supabase
+		const {data, error} = await supabase
 			.storage
 			.from("convocatorias-sedes")
 			.upload(`${nombre_sede_transformado}`, file_pdf.buffer, {
@@ -44,11 +44,11 @@ const SedeModel = {
 		return data;
 	},
 	async obtenerSedes() {
-		const { data, error } = await supabase
-		    .from("sede")
+		const {data, error} = await supabase
+			.from("sede")
 			.select("id_sede, nombre_sede")
 			.eq("estado", "aceptado")
-		
+
 		if (error) {
 			throw new Error("Error al obtener las sedes: " + error.message);
 		}
@@ -56,7 +56,7 @@ const SedeModel = {
 		return data;
 	},
 	async obtenerTodaInfoSedes() {
-		const { data, error } = await supabase
+		const {data, error} = await supabase
 			.rpc("obt_toda_info_sedes")
 
 		if (error) {
@@ -66,23 +66,19 @@ const SedeModel = {
 		return data;
 	},
 	async aceptarSede(id_sede) {
-		const { data, error } = await supabase
+		const {error} = await supabase
 			.from("sede")
-			.update({ estado: "aceptado" })
+			.update({estado: "aceptado"})
 			.eq("id_sede", id_sede)
-			.select("num_grupos_sede")
-			.single();
 
 		if (error) {
 			throw new Error("Error al aprobar la sede: " + error.message);
 		}
-
-		return data;
 	},
 	async rechazarSede(id_sede) {
-		const { data, error } = await supabase
+		const {data, error} = await supabase
 			.from("sede")
-			.update({ estado: "rechazado" })
+			.update({estado: "rechazado"})
 			.eq("id_sede", id_sede);
 
 		if (error) {
@@ -92,7 +88,7 @@ const SedeModel = {
 		return data;
 	},
 	async getTopSedes() {
-		const { data, error } = await supabase
+		const {data, error} = await supabase
 			.rpc("obt_numero_participantes_sedes")
 
 		if (error) {
@@ -102,7 +98,7 @@ const SedeModel = {
 		return data;
 	},
 	async getSedesEstado() {
-		const { data, error } = await supabase
+		const {data, error} = await supabase
 			.rpc("obt_sedes_estado")
 
 		if (error) {
@@ -112,7 +108,7 @@ const SedeModel = {
 		return data;
 	},
 	async getDetallesUnaSede(id_sede) {
-		const { data, error } = await supabase
+		const {data, error} = await supabase
 			.from("coord_sede")
 			.select("nombre, correo, sede!inner(nombre_sede, estado, fecha_solicitud, fecha_inicio)")
 			.eq("sede.id_sede", id_sede)
@@ -124,55 +120,8 @@ const SedeModel = {
 
 		return data;
 	},
-
-	/**
-	 * Descarga el archivo de convocatoria para una sede específica.
-	 * @returns {Promise<Object>} Los datos del archivo de convocatoria o un objeto de error.
-	 * @throws {Error} Si hay un error al descargar el archivo de convocatoria.
-	 * @param fileName {string} - La ruta del archivo de convocatoria en el almacenamiento de Supabase.
-	 */
-	async descargarConvocatoria(fileName) {
-		const { data, error } = await supabase
-			.storage
-			.from("convocatorias-sedes")
-			.download(fileName);
-
-		if (error) {
-			if (error.statusCode === 404) {
-				throw new Error("Sede no encontrada");
-			} else if (error.statusCode === 403) {
-				throw new Error("Acceso denegado");
-			} else if (error.statusCode === 401) {
-				throw new Error("Token de sesión requerido");
-			} else {
-				throw new Error("Error al descargar la convocatoria: " + error.message);
-			}
-		}
-
-		return data;
-	},
-
-	/**
-	 * Obtains the path of the signed convocatoria for a specific sede.
-	 * @param {string} id_sede - The ID of the sede.
-	 * @returns {Promise<string>} The path of the signed convocatoria.
-	 * @throws {Error} If there is an error obtaining the signed convocatoria.
-	 */
-	async getConvocatoriaPathById(id_sede) {
-		const { data, error } = await supabase
-			.from("sede")
-			.select("convocatoria_firmada")
-			.eq("id_sede", id_sede)
-			.single();
-
-		if (error) {
-			throw new Error("Error al obtener la convocatoria firmada: " + error.message);
-		}
-
-		return data.convocatoria_firmada;
-	},
 	async getCoordSedeDataByIdSede(id_sede) {
-		const { data, error } = await supabase
+		const {data, error} = await supabase
 			.from("coord_sede")
 			.select("nombre, correo")
 			.eq("id_sede", id_sede)
@@ -186,9 +135,9 @@ const SedeModel = {
 		return data;
 	},
 	async getSedesAndSedeCoordinator() {
-		const { data, error } = await supabase
+		const {data, error} = await supabase
 			.from("coord_sede")
-			.select("nombre, sede!inner(id_sede, nombre_sede, fecha_solicitud)") // !inner() aplica un filtro a la relación
+			.select("nombre, correo, sede!inner(id_sede, nombre_sede, estado, fecha_solicitud, fecha_inicio)") // !inner() aplica un filtro a la relación
 			.eq("sede.estado", "pendiente");
 
 		if (error) {
@@ -198,7 +147,7 @@ const SedeModel = {
 		return data;
 	},
 	async getNumeroSolicitudesSedes() {
-		const { data, error } = await supabase
+		const {data, error} = await supabase
 			.rpc("obt_numero_solicitud_sedes")
 			.single();
 
@@ -207,7 +156,44 @@ const SedeModel = {
 		}
 
 		return data.total_sedes;
-	}
+	},
+	async insertPassword(id_sede, password) {
+		const {error} = await supabase
+			.from("coord_sede")
+			.update({password})
+			.eq("id_sede", id_sede);
+
+		if (error) {
+			throw new Error("Error al insertar la contraseña: " + error.message);
+		}
+	},
+	async getDataSede(id_sede) {
+		const {data, error} = await supabase
+			.from("sede")
+			.select("nombre_sede, fecha_inicio ")
+			.eq("id_sede", id_sede)
+			.single();
+
+		if (error) {
+			throw new Error("Error al obtener el nombre de la sede: " + error.message);
+		}
+
+		return data;
+	},
+	async actualizarEstadoPostulacion(id_aplicante, rolTabla, nuevoEstado) {
+		const {data, error} = await supabase
+			.from(rolTabla)
+			.update({estado: nuevoEstado, timestamp_resuelto: new Date()})
+			.eq(`id_${rolTabla}`, id_aplicante)
+			.select(`id_${rolTabla}`)
+			.single();
+
+		if (error) {
+			throw new Error(`Error al actualizar ${rolTabla}: ${error.message}`);
+		}
+
+		return data;
+	},
 }
 
 module.exports = SedeModel;

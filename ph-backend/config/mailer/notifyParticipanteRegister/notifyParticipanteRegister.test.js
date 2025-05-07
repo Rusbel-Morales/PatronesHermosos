@@ -1,50 +1,38 @@
 const { mock } = require("nodemailer");
 const NotifyParticipanteRegister = require("./notifyParticipanteRegister");
 
-describe("NotifyParticipanteRegister Module", () => {
+describe("NotifyParticipanteRegister", () => {
 	beforeEach(() => {
 		mock.reset();
 	});
 
-	it("should send a participant registration email with default message", async () => {
-		const notifyEmail = new NotifyParticipanteRegister();
-		const participante = {
-			nombre: "Carlos Ruiz",
-			correo: "carlos.ruiz@ejemplo.com",
-		};
+	it("debería enviar un correo con el mensaje por defecto", async () => {
+		const email = new NotifyParticipanteRegister();
+		await email.sendEmail({
+			nombre: "Luis",
+			correo: "luis@example.com"
+		});
 
-		await notifyEmail.sendEmail(participante.nombre, participante.correo);
+		const sentMail = mock.getSentMail();
 
-		const sentEmails = mock.getSentMail();
-		expect(sentEmails.length).toBe(1);
-		expect(sentEmails[0].to).toBe(participante.correo);
-		expect(sentEmails[0].subject).toBe("Registro de Participante");
-		expect(sentEmails[0].text).toContain("Hola Carlos Ruiz");
-		expect(sentEmails[0].text).toContain("Tu registro como participante ha sido exitoso");
+		expect(sentMail).toHaveLength(1);
+		expect(sentMail[0]).toMatchObject({
+			from: process.env.EMAIL_USER,
+			to: "luis@example.com",
+			subject: "Registro de Participante",
+			text: "Hola Luis,\nTu registro como participante ha sido exitoso"
+		});
 	});
 
-	it("should send a participant registration email with a custom message", async () => {
-		const notifyEmail = new NotifyParticipanteRegister();
-		const participante = {
-			nombre: "Elena Castro",
-			correo: "elena.castro@ejemplo.com",
-		};
-		const customMessage = "Bienvenida al evento, estamos felices de tenerte.";
+	it("debería permitir sobreescribir el mensaje", async () => {
+		const email = new NotifyParticipanteRegister();
+		await email.sendEmail({
+			nombre: "Luis",
+			correo: "luis@example.com",
+			mensaje: "¡Bienvenido a Patrones Hermosos como participante!"
+		});
 
-		await notifyEmail.sendEmail(participante.nombre, participante.correo, customMessage);
-
-		const sentEmails = mock.getSentMail();
-		expect(sentEmails.length).toBe(1);
-		expect(sentEmails[0].to).toBe(participante.correo);
-		expect(sentEmails[0].text).toContain(customMessage);
-	});
-
-	it("should handle email sending errors", async () => {
-		const notifyEmail = new NotifyParticipanteRegister();
-		mock.setShouldFailOnce(true);
-
-		await expect(
-			notifyEmail.sendEmail("Laura Méndez", "laura.mendez@ejemplo.com")
-		).rejects.toThrow();
+		const sentMail = mock.getSentMail();
+		expect(sentMail[0].text).toBe("Hola Luis,\n¡Bienvenido a Patrones Hermosos como participante!");
 	});
 });

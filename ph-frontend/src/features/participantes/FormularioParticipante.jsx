@@ -5,7 +5,9 @@ import { FaArrowUp, FaInfoCircle } from "react-icons/fa";
 import { fetchSedesParticipante, createParticipante } from "../../services/participanteService";
 import { calcularProgresoParticipante } from '../../utils/participanteProgreso';
 import { escolaridades, idiomas, niveles, roles } from "../../utils/optionsCollections";
-import ParticipantePreview from "../../components/previews/ParticipantePreview";
+import ParticipanteFormPreview from "../../components/form_previews/ParticipanteFormPreview.jsx";
+import SuccessModal from "../../components/modals/SuccessModal";
+import ErrorModal from "../../components/modals/ErrorModal";
 
 /**
  * @typedef {Object} ParticipanteFormData
@@ -31,6 +33,7 @@ const ParticipanteForm = ({ onSubmit, setProgress }) => {
 			correo: "",
 			edad: 0,
 			escolaridad: "",
+			idioma_preferencia: "",
 			grado: 0,
 		},
 		tutor: {
@@ -48,6 +51,8 @@ const ParticipanteForm = ({ onSubmit, setProgress }) => {
 	const [fileName, setFileName] = useState("");
 	const [fileURL, setFileURL] = useState(null);
 	const [showPreview, setShowPreview] = useState(false);
+	const [isSuccessModalOpen, setIsSuccessModalOpen] = useState(false);
+	const [isErrorModalOpen, setIsErrorModalOpen] = useState(false);
 
 	const [sedesCollection, setSedesCollection] = useState(
 		createListCollection({ items: [] })
@@ -73,9 +78,11 @@ const ParticipanteForm = ({ onSubmit, setProgress }) => {
 		const { participante, tutor, archivo, sede } = formData;
 		const isParticipanteEmailValid = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/.test(participante.correo);
 		const isTutorEmailValid = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/.test(tutor.correo);
-		const isArchivoSubido = archivo !== null;
 		const isSedeSeleccionada = sede.id_sede !== 0;
-	
+		const isArchivoSubido = archivo !== null;
+		const isArchivoPDF = archivo && archivo.name.toLowerCase().endsWith('.pdf');
+		const isArchivoSizeValid = archivo && archivo.size <= 2097152; // 2MB = 2097152 bytes
+
 		return (
 			participante.nombre.trim() !== "" &&
 			participante.correo.trim() !== "" &&
@@ -87,8 +94,10 @@ const ParticipanteForm = ({ onSubmit, setProgress }) => {
 			tutor.correo.trim() !== "" &&
 			isTutorEmailValid &&
 			tutor.telefono.trim() !== "" &&
+			isSedeSeleccionada &&
 			isArchivoSubido &&
-			isSedeSeleccionada
+			isArchivoPDF &&
+			isArchivoSizeValid
 		);
 	};
 
@@ -148,12 +157,14 @@ const ParticipanteForm = ({ onSubmit, setProgress }) => {
 	const handleSubmit = async (e) => {
 		e.preventDefault();
 		try {
-		  const response = await createParticipante(formData);
-		  console.log("✅ Registro exitoso:", response);
+			const response = await createParticipante(formData);
+			console.log("✅ Registro exitoso:", response);
+			setIsSuccessModalOpen(true);
 		} catch (error) {
-		  console.error("❌ Error al registrar:", error);
+			console.error("❌ Error al registrar:", error);
+			setIsErrorModalOpen(true);
 		}
-	  };
+		};
 
 
 	useEffect(() => {
@@ -206,9 +217,11 @@ const ParticipanteForm = ({ onSubmit, setProgress }) => {
 		}
 	}, [formData.tutor.telefono]);
 
+	console.log({formData})
+
 	return (
 		<form onSubmit={handleSubmit}>
-			<Stack align="center" mt="4">
+			<Stack align="center" w="100vw" h="45vh" mt="4">
 				<Card.Root maxW="6xl" w="full" bg="gray.100" pl="10" pr="10">
 					{!showPreview ? (
 						<>
@@ -333,6 +346,47 @@ const ParticipanteForm = ({ onSubmit, setProgress }) => {
 											<Select.Positioner>
 												<Select.Content>
 													{escolaridades.items.map((item) => (
+														<Select.Item item={item} key={item.value}>
+															{item.label}
+															<Select.ItemIndicator />
+														</Select.Item>
+													))}
+												</Select.Content>
+											</Select.Positioner>
+										</Portal>
+									</Select.Root>
+
+									{/* Select de Idioma Preferido */}
+									<Select.Root
+										collection={idiomas}
+										value={[formData.participante.idioma_preferencia]}
+										onValueChange={(details) => {
+											const updatedData = {
+												...formData,
+												participante: {
+													...formData.participante,
+													idioma_preferido: details.value[0],
+												},
+											};
+											setFormData(updatedData);
+											const updatedProgress = calcularProgresoParticipante(updatedData);
+											setProgress(updatedProgress);
+										}}
+									>
+										<Select.HiddenSelect />
+										<Select.Label fontSize="lg">Idioma de preferencia:</Select.Label>
+										<Select.Control>
+											<Select.Trigger>
+												<Select.ValueText placeholder="Selecciona tu idioma preferido" />
+											</Select.Trigger>
+											<Select.IndicatorGroup>
+												<Select.Indicator />
+											</Select.IndicatorGroup>
+										</Select.Control>
+										<Portal>
+											<Select.Positioner>
+												<Select.Content>
+													{idiomas.items.map((item) => (
 														<Select.Item item={item} key={item.value}>
 															{item.label}
 															<Select.ItemIndicator />
@@ -500,7 +554,15 @@ const ParticipanteForm = ({ onSubmit, setProgress }) => {
 										<Input
 											type="file"
 											name="permiso_tutor"
-											onChange={handleFileUpload}
+											onChange={(e) => {
+												const file = e.target.files?.[0];
+												if (file && file.size > 2097152) { // 2MB = 2097152 bytes
+													alert("El tamaño del archivo no debe superar 2MB.");
+													e.target.value = null; // Clear the input
+													return;
+												}
+												handleFileUpload(e);
+											}}
 											required
 											style={{ display: "none" }}
 											id="fileInput"
@@ -517,6 +579,14 @@ const ParticipanteForm = ({ onSubmit, setProgress }) => {
 										{fileName && (
 											<Text mt={2}>Archivo seleccionado: {fileName}</Text>
 										)}
+										{fileName && !fileName.endsWith('.pdf') && (
+												<Text color="red.500" fontSize="sm" mt={2}>
+													Porfavor, solo archivos tipo PDF
+												</Text>
+										)}
+										<Text fontSize="sm" color="gray.500" mt={1}>
+											El tamaño máximo del archivo es de 2MB.
+										</Text>
 									</Field.Root>
 								</Stack>
 							</Card.Body>
@@ -533,7 +603,7 @@ const ParticipanteForm = ({ onSubmit, setProgress }) => {
 							</Card.Footer>
 						</>
 					) : (
-							<ParticipantePreview
+							<ParticipanteFormPreview
 							formData={formData}
 							fileURL={fileURL}
 							fileName={fileName}
@@ -542,6 +612,18 @@ const ParticipanteForm = ({ onSubmit, setProgress }) => {
 					)}
 				</Card.Root>
 			</Stack>
+
+			<SuccessModal
+									isOpen={isSuccessModalOpen}
+									onClose={() => setIsSuccessModalOpen(false)}
+									message="Te has registrado correctamente"
+									/>
+			
+						<ErrorModal
+									isOpen={isErrorModalOpen}
+									onClose={() => setIsErrorModalOpen(false)}
+									message="Ocurrió un error en registrarte, intenta nuevamente"
+									/>
 		</form>
 	);
 };

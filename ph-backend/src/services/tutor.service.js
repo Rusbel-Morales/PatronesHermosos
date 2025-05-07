@@ -12,9 +12,8 @@ const TutorService = {
 
         // Crear un nombre único para el archivo de permiso del tutor
         const nombrePermisoTutor = uniqueFileName(file_pdf);
-        console.log(nombrePermisoTutor);
+
         const nombrePermisoTutorTransformado = transformNamePermisoTutor(nombrePermisoTutor);
-        console.log(nombrePermisoTutorTransformado);
 
         // Insertar el archivo de permiso del tutor en el storage de supabase
         const { fullPath } = await TutorModel.enviarPermiso(nombreCarpeta, nombrePermisoTutorTransformado, file_pdf);

@@ -2,6 +2,7 @@
 // Modal de error que se muestra cuando ocurre un error al enviar un formulario.
 
 import { ImCancelCircle } from "react-icons/im";
+import { motion } from "framer-motion";  // Importa motion
 import { AbsoluteCenter, Center, Circle, Square } from "@chakra-ui/react";
 import {
     Button,
@@ -29,19 +30,22 @@ const ErrorModal = ({ isOpen, onClose, message }) => {
             <Portal>
                 <Dialog.Backdrop />
                 <Dialog.Positioner>
-                    <Dialog.Content>
-                        <Center bg="withe" h="120px" color="white">
+                    <Dialog.Content
+                    w="70vw"
+                    h="30vh">
+
+                        <Center bg="withe" h="13vh"  color="white">
                             <motion.div
                                 initial={{ scale: 0, rotate: -180, opacity: 0 }}
                                 animate={{ scale: 1, rotate: 0, opacity: 1 }}
                                 transition={{ duration: 0.5, ease: "easeOut" }}
                             >
-                                <ImCancelCircle color="purple" size={90} />
+                                <ImCancelCircle color="purple" size={60} />
                             </motion.div>
                         </Center>
 
-                        <Center bg="withe" h="40px" color="white">
-                            <Dialog.Header fontSize="4xl" color={"black"} fontWeight="bold">
+                        <Center bg="withe" h="5vh" color="white">
+                            <Dialog.Header fontSize="2xl" color={"black"} fontWeight="bold">
                                 Error
                             </Dialog.Header>
                         </Center>
@@ -50,7 +54,8 @@ const ErrorModal = ({ isOpen, onClose, message }) => {
                             <Center
                                 fontSize={"1xl"}
                                 bg="withe"
-                                h="60px"
+                                h="4vh"
+                               
                                 color="white"
                                 textAlign={"center"}
                             >
@@ -61,18 +66,21 @@ const ErrorModal = ({ isOpen, onClose, message }) => {
                         <Center
                             fontSize={"2xl"}
                             bg="withe"
-                            h="60px"
+                            h="7vh"
+                            
                             color="white"
                             textAlign={"center"}
                         >
-                            <Dialog.Footer fontSize="3xl">
+                            <Dialog.Footer fontSize="2xl">
                                 <Button
                                     onClick={onClose}
                                     colorPalette={"purple"}
-                                    width="100%"
-                                    fontSize="2xl"
-                                    paddingX="20"
-                                    paddingY="4"
+                                    width="12vw"
+                                    height="5vh"
+                                    fontSize="sm"
+                                    
+                                    
+                                    
                                 >
                                     Cerrar
                                 </Button>

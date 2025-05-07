@@ -4,8 +4,11 @@ import { FaArrowUp } from "react-icons/fa";
 import { createSede } from "../../services/sedeService";
 import { calcularProgresoSede } from '../../utils/sedeProgreso';
 import { fechas } from "@/utils/optionsCollections.js";
-import SedePreview from "../../components/previews/SedePreview";
+import SedeFormPreview from "../../components/form_previews/SedeFormPreview.jsx";
+import SuccessModal from "../../components/modals/SuccessModal";
+import ErrorModal from "../../components/modals/ErrorModal";
 /**
+
  * @typedef {Object} SedeFormData
  * @property {{ nombre: string, correo: string, telefono: string }} coordSede
  * @property {{ nombre_sede: string, num_grupos_sede: number, fecha_inicio: string }} sede
@@ -39,12 +42,18 @@ const SedeForm = ({ onSubmit, setProgress }) => {
 	const [fileName, setFileName] = useState("");
 	const [fileURL, setFileURL] = useState(null);
 	const [showPreview, setShowPreview] = useState(false);
+	const [isSuccessModalOpen, setIsSuccessModalOpen] = useState(false);
+	const [isErrorModalOpen, setIsErrorModalOpen] = useState(false);
 
 	const isValidEmail = (email) => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
 	const isValidPhone = (phone) => /^\d{10}$/.test(phone);
 
 	const isFormComplete = () => {
-		const { coordSede, sede } = formData;
+		const { coordSede, sede, archivo } = formData;
+		const isArchivoSubido = archivo !== null;
+		const isArchivoPDF = archivo && archivo.name.toLowerCase().endsWith('.pdf');
+		const isArchivoSizeValid = archivo && archivo.size <= 2097152; // 2MB = 2097152 bytes
+
 		return (
 			coordSede.nombre.trim() !== "" &&
 			coordSede.correo.trim() !== "" &&
@@ -52,7 +61,9 @@ const SedeForm = ({ onSubmit, setProgress }) => {
 			sede.nombre_sede.trim() !== "" &&
 			sede.num_grupos_sede > 0 &&
 			sede.fecha_inicio.trim() !== "" &&
-			formData.archivo !== null
+			isArchivoSubido &&
+			isArchivoPDF &&
+			isArchivoSizeValid
 		);
 	};
 
@@ -108,7 +119,7 @@ const SedeForm = ({ onSubmit, setProgress }) => {
 	// Define la función una sola vez, por ejemplo, al inicio del componente:
 const convertirFechaISO = (fechaStr) => {
 	if (!fechaStr || !fechaStr.includes('/')) {
-	  console.error("El valor de fecha no es válido:", fechaStr);
+	 
 	  return fechaStr; // O devuelve una cadena vacía según convenga
 	}
 	const [dia, mes, anio] = fechaStr.split('/');
@@ -133,14 +144,16 @@ const convertirFechaISO = (fechaStr) => {
 	  // Asegúrate de enviar el objeto convertido
 	  const response = await createSede(formDataToSend);
 	  console.log("✅ Registro exitoso:", response);
+	  setIsSuccessModalOpen(true);
 	} catch (error) {
 	  console.error("❌ Error al registrar:", error);
+	  setIsErrorModalOpen(true);
 	}
   };
 
 	return (
 		<form onSubmit={handleSubmit}>
-			<Stack align="center" mt="4">
+			<Stack align="center" w="100vw" h="45vh" mt="4">
 				<Card.Root maxW="6xl" w="full" bg="gray.100" pl="10" pr="10">
 					{!showPreview ? (
 						<>
@@ -283,7 +296,15 @@ const convertirFechaISO = (fechaStr) => {
 										<Input
 											type="file"
 											name="convocatoria_firmada"
-											onChange={handleFileUpload}
+											onChange={(e) => {
+												const file = e.target.files?.[0];
+												if (file && file.size > 2097152) { // 2MB = 2097152 bytes
+													alert("El tamaño del archivo no debe superar 2MB.");
+													e.target.value = null; // Clear the input
+													return;
+												}
+												handleFileUpload(e);
+											}}
 											required
 											style={{ display: "none" }}
 											id="fileInput"
@@ -296,6 +317,14 @@ const convertirFechaISO = (fechaStr) => {
 											<FaArrowUp /> Subir Archivo
 										</Button>
 										{fileName && <Text mt={2}>Archivo seleccionado: {fileName}</Text>}
+										{fileName && !fileName.endsWith('.pdf') && (
+												<Text color="red.500" fontSize="sm" mt={2}>
+													Porfavor, solo archivos tipo PDF
+												</Text>
+										)}
+										<Text fontSize="sm" color="gray.500" mt={1}>
+											El tamaño máximo del archivo es de 2MB.
+										</Text>
 									</Field.Root>
 								</Stack>
 							</Card.Body>
@@ -312,7 +341,7 @@ const convertirFechaISO = (fechaStr) => {
 							</Card.Footer>
 						</>
 					) : (
-						<SedePreview
+						<SedeFormPreview
 							formData={formData}
 							fileURL={fileURL}
 							fileName={fileName}
@@ -320,7 +349,21 @@ const convertirFechaISO = (fechaStr) => {
 						/>
 					)}
 				</Card.Root>
+
+				
+				
 			</Stack>
+			<SuccessModal
+						isOpen={isSuccessModalOpen}
+						onClose={() => setIsSuccessModalOpen(false)}
+						message="La sede se ha registrado correctamente"
+						/>
+
+			<ErrorModal
+						isOpen={isErrorModalOpen}
+						onClose={() => setIsErrorModalOpen(false)}
+						message="Ocurrió un error al registrar la sede"
+						/>
 		</form>
 	);
 };

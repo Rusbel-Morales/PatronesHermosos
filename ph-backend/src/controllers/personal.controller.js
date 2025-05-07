@@ -1,22 +1,7 @@
 // personal.controller.js
 // Se encarga de manejar la lógica de las peticiones HTTP relacionadas con el personal en la API REST, utilizando los servicios de PersonalService.
-
 const PersonalService = require("../services/personal.service");
-
-function validateData(personal, sede) {
-
-	// Validar datos del personal
-	if (!personal.nombre || !personal.correo || !personal.universidad_origen || !personal.carrera || !personal.idioma_preferencia || !personal.nivel_preferencia || !personal.rol_preferencia) {
-		return "Faltan datos del personal";
-	}
-
-	// Validar el id de la sede de participación
-	if (!sede.id_sede) {
-		return "Falta el id de la sede";
-	}
-
-	return null;
-}
+const { validateDataPersonal } = require("../utils/validateData.js");
 
 const PersonalController = {
     async registrarPersonal(req, res) {
@@ -24,7 +9,7 @@ const PersonalController = {
             const { personal, sede } = req.body;
 
 			// Validaciones de los datos
-			const error = validateData(personal, sede);
+			const error = validateDataPersonal(personal, sede);
 			if (error) {
 				return res.status(400).json({ error });
 			}
@@ -36,6 +21,48 @@ const PersonalController = {
 		} catch (error) {
 			res.status(500).json({ error: error.message })
 		}
+	},
+	async obtenerUsuariosEstadoRol(req, res) {
+		try {
+			const { id_sede } = req.query;
+			
+			if (!id_sede) {
+				return res.status(400).json({ error: "Id de sede no proporcionado" });
+			}
+
+			const usuariosEstadoRol = await PersonalService.obtenerUsuariosEstadoRol(id_sede);
+			res.status(200).json(usuariosEstadoRol);
+		} catch (error) {
+			res.status(500).json({ error: error.message });
+		}
+	},
+	async obtenerTotalPersonalRol(req, res) {
+		try {
+			const { id_sede } = req.query;
+			
+			if (!id_sede) {
+				return res.status(400).json({ error: "Id de sede no proporcionado" });
+			}
+
+			const totalPersonalRol = await PersonalService.obtenerTotalPersonalRol(id_sede);
+			res.status(200).json(totalPersonalRol);
+		} catch (error) {
+			res.status(500).json({ error: error.message });
+		}
+	},
+	async listarPersonal(req, res) {
+			try {
+				const { id_sede } = req.query;
+
+				if (!id_sede) {
+					return res.status(400).json({ error: "Id de sede no proporcionado" });
+				}
+
+				const personal = await PersonalService.listarPersonal(id_sede);
+				res.status(200).json(personal);
+			} catch (error) {
+				res.status(500).json({ error: error.message });
+			}
 	}
 };
 

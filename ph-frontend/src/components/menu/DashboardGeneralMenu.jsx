@@ -5,7 +5,7 @@ import {
   Image,
   Button,
   CloseButton,
-  Dialog
+  Dialog  
 } from "@chakra-ui/react";
 import {
   FaBars,
@@ -15,15 +15,19 @@ import {
   FaChartBar,
   FaTrash,
   FaDownload,
+  FaSignOutAlt
 } from "react-icons/fa";
 import { useState } from "react";
 import { HiCog } from "react-icons/hi";
 import { useNavigate } from "react-router";
 import logoMorado from "../../assets/logo-morado.png";
+import BorrarDatosModal from "../../components/modals/BorrarDatosModal";
+import CerrarSesionModal from "../modals/CerrarSesionModal";
 
 const DashboardGeneralMenu = () => {
   const [open, setOpen] = useState(false);
-  const [confirmDialog, setConfirmDialog] = useState(false);
+  const [confirmDialogDelete, setConfirmDialogDelete] = useState(false);
+  const [confirmDialogSesion, setConfirmDialogSesion] = useState(false);
   const navigate = useNavigate();
 
   const handleDeleteConfirmed = () => {
@@ -35,9 +39,17 @@ const DashboardGeneralMenu = () => {
   const handleClickBorrar = () => {
     setOpen(false);
     setTimeout(() => {
-      setConfirmDialog(true);
+      setConfirmDialogDelete(true);
     }, 300); // asegurarte que el Drawer cierre antes de abrir el Dialog
   };
+
+  const handleClickSesion = () => {
+    setOpen(false);
+    setTimeout(() => {
+      setConfirmDialogSesion(true);
+    }, 300); // asegurarte que el Drawer cierre antes de abrir el Dialog
+  };
+
 
   return (
     <>
@@ -56,7 +68,7 @@ const DashboardGeneralMenu = () => {
                 <Drawer.Title>Panel de Control</Drawer.Title>
               </Drawer.Header>
               <Drawer.Body>
-                <Stack gap="10" align="flex-start">
+                <Stack gap="5" align="flex-start">
                   <Image src={logoMorado} alt="Patrones Hermosos" boxSize={["80px", "100px"]} objectFit="cover" ml="9"/>
                   <Button variant="ghost" colorPalette={"purple"} size="lg" onClick={() => navigate("/coord-general/dashboard")}>
                     <FaChartBar /> Dashboard
@@ -75,6 +87,9 @@ const DashboardGeneralMenu = () => {
               <Drawer.Footer>
 
               <Stack gap="4" pr="5" align="flex-start">
+                  <Button variant="ghost" size="md" colorPalette="black" onClick={handleClickSesion}>
+                    <FaSignOutAlt/> Cerrar Sesión
+                  </Button>
                   <Button variant="ghost" size="md" colorPalette="black">
                     <FaDownload /> Crear Estadísticas
                   </Button>
@@ -97,33 +112,27 @@ const DashboardGeneralMenu = () => {
         </Portal>
       </Drawer.Root>
 
-      {/* Dialog de Confirmación */}
-      <Dialog.Root open={confirmDialog} onOpenChange={(e) => setConfirmDialog(e.open)} role="alertdialog">
-        <Portal>
-          <Dialog.Backdrop />
-          <Dialog.Positioner>
-            <Dialog.Content>
-              <Dialog.Header>
-                <Dialog.Title>¿Seguro que quieres borrar la base de datos?</Dialog.Title>
-              </Dialog.Header>
-              <Dialog.Body>
-                Esta acción <strong>no es reversible</strong>. Se eliminarán todos los datos permanentemente.
-              </Dialog.Body>
-              <Dialog.Footer>
-                <Dialog.ActionTrigger asChild>
-                  <Button variant="outline" >Cancelar</Button>
-                </Dialog.ActionTrigger>
-                <Button colorPalette="red" onClick={handleDeleteConfirmed}>
-                  Aceptar
-                </Button>
-              </Dialog.Footer>
-              <Dialog.CloseTrigger asChild>
-                <CloseButton size="sm" />
-              </Dialog.CloseTrigger>
-            </Dialog.Content>
-          </Dialog.Positioner>
-        </Portal>
-      </Dialog.Root>
+      <BorrarDatosModal
+      open={confirmDialogDelete}
+      onClose={setConfirmDialogDelete}
+      onConfirm={handleDeleteConfirmed}
+      />
+
+    <CerrarSesionModal
+      open={confirmDialogSesion}
+      onClose={setConfirmDialogSesion}
+      onConfirm={() => {
+        localStorage.removeItem("rol");
+        localStorage.removeItem("token");
+        localStorage.removeItem("username");
+        console.log("🚪 Sesión cerrada");
+        navigate("/administracion/login");
+        // Aquí podrías usar toast, navigate, etc.
+      }}
+      />
+
+
+
     </>
   );
 };

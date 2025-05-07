@@ -9,7 +9,6 @@ const supabase = require('../../config/database');
  * @param {string} coordSede.nombre - The name of the sede coordinator
  * @param {string} coordSede.correo - The email of the sede coordinator
  * @param {string} coordSede.telefono - The phone number of the sede coordinator
- * @param {string} coordSede.password - The password to access the sede coordinator account
  * @param {number} coordSede.id_sede - The id of the sede coordinator
  * @returns {Promise<Object>} The object data or an error object
  */

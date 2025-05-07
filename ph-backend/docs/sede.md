@@ -9,7 +9,7 @@ Este endpoint requiere un formulario con los siguientes datos:
 
 #### **Cuerpo de la solicitud (multipart/form-data)**
 - `data` (string, requerido): JSON que contiene los datos de la coordinadora de sede y la sede. La estructura es la siguiente:
-  
+
   ```json
   {
       "coordSede": {
@@ -137,37 +137,50 @@ Si la solicitud es exitosa, el servidor responderá con un JSON en el siguiente 
 ```json
 [
     {
-        "id_sede": 19,
+        "id_sede": 95,
         "nombre_sede": "Tec Campus Puebla",
-        "estado": "(pendiente | aceptado | rechazado)",
-        "fecha_solicitud": "2025-03-24",
-        "fecha_inicio": "2025-03-30",
-        "nombre_coord_sede": "Antonieta Garcia",
-        "correo_coord_sede": "garcia@gmail.com",
-        "total_participantes": 0,
-        "total_grupos": 0
+        "estado": "aceptado",
+        "fecha_solicitud": "2025-04-09",
+        "fecha_inicio": "2025-07-14",
+        "coord_sede": {
+            "correo": "rusbelmorales@gmail.com",
+            "nombre": "Alejandro Morales"
+        },
+        "mentora": [
+            "Alejandro",
+            "Alejandro Méndez",
+            "Carlos",
+            "Diego Insano",
+            "donatelo@gmail.com",
+            "fernanda",
+            "Gadiro",
+            "Javier Antonio",
+            "lolo",
+            "mamasita",
+            "Maria LOLA",
+            "miguel",
+            "miguelan",
+            "Olmos",
+            "papanicolao",
+            "paquita",
+            "Pedri ",
+            "qqq",
+            "Rosa Paredes",
+            "rosi",
+            "Rusbel"
+        ]
     },
     {
-        "id_sede": 20,
+        "id_sede": 96,
         "nombre_sede": "Tec Campus Toluca",
-        "estado": "(pendiente | aceptado | rechazado)",
-        "fecha_solicitud": "2025-03-24",
-        "fecha_inicio": "2025-03-30",
-        "nombre_coord_sede": "Rusbel Morales",
-        "correo_coord_sede": "rusbelalejandrom@gmail.com",
-        "total_participantes": 0,
-        "total_grupos": 0
-    },
-    {
-        "id_sede": 21,
-        "nombre_sede": "Tec Santa Fe",
-        "estado": "(pendiente | aceptado | rechazado)",
-        "fecha_solicitud": "2025-03-25",
-        "fecha_inicio": "2025-03-30",
-        "nombre_coord_sede": "Diego Javier",
-        "correo_coord_sede": "diego@gmail.com",
-        "total_participantes": 0,
-        "total_grupos": 0
+        "estado": "rechazado",
+        "fecha_solicitud": "2025-04-09",
+        "fecha_inicio": "2025-07-07",
+        "coord_sede": {
+            "correo": "julieta@gmail.com",
+            "nombre": "Julieta García"
+        },
+        "mentora": []
     }
 ]
 ```
@@ -304,9 +317,9 @@ Si ocurre un problema inesperado, se enviará la siguiente respuesta:
 
 Este error indica que hubo un problema en el servidor. Se recomienda contactar al equipo de desarrollo backend para su resolución.
 
-## **GET /sedes/:id/convocatoria**
+## **GET /sedes/:id/descargar-convocatoria-sede**
 
-Este endpoint permite a la Coordinadora General descargar el archivo PDF de la convocatoria correspondiente a una sede específica.
+Este endpoint permite a la **Coordinadora General** descargar el archivo PDF de la convocatoria correspondiente a una sede específica.
 
 ### **Parámetros**
 
@@ -340,25 +353,7 @@ Si no se proporciona un token válido:
 
 ```json
 {
-    "error": "Token de sesión requerido"
-}
-```
-
-#### **403 - Prohibido**
-Si el usuario no tiene permisos para acceder a este recurso:
-
-```json
-{
-    "error": "Acceso denegado"
-}
-```
-
-#### **404 - No Encontrado**
-Si no se encuentra la sede solicitada:
-
-```json
-{
-    "error": "Sede no encontrada"
+    "error": "No se proporcionó un token"
 }
 ```
 
@@ -367,6 +362,96 @@ Si ocurre un problema inesperado al descargar la convocatoria:
 
 ```json
 {
-    "error": "Error al descargar la convocatoria: (mensaje del error)"
+    "error": "Error al descargar el archivo pdf de la convocatoria de la sede: (mensaje del error)"
+}
+```
+
+## Gestión de Postulaciones
+
+### **POST /sedes/:id_aplicante/postulaciones/aceptar**
+
+Este endpoint permite aceptar la postulación de una aplicante.
+
+#### **Parámetros**
+
+- `id_aplicante` (path, requerido): Identificador único de la aplicante.
+
+##### **Cuerpo de la solicitud (application/json)**
+
+```json
+{
+  "rol": "Mentora",
+  "nombre": "Carolina Pérez",
+  "correo": "carolina.perez@example.com"
+}
+```
+
+#### **Respuesta Exitosa (200 OK)**
+
+```json
+{
+  "message": "Postulación aceptada con éxito"
+}
+```
+
+#### **Códigos de Estado en Caso de Error**
+
+##### **400 - Solicitud Incorrecta**
+
+```json
+{
+  "error": "Faltan campos obligatorios o el formato es incorrecto"
+}
+```
+
+##### **500 - Error Interno del Servidor**
+
+```json
+{
+  "error": "Error interno al procesar la postulación"
+}
+```
+
+### **POST /sedes/:id_aplicante/postulaciones/rechazar**
+
+Este endpoint permite rechazar la postulación de una aplicante.
+
+#### **Parámetros**
+
+- `id_aplicante` (path, requerido): Identificador único de la aplicante.
+
+##### **Cuerpo de la solicitud (application/json)**
+
+```json
+{
+  "rol": "Facilitadora",
+  "nombre": "Ana López",
+  "correo": "ana.lopez@example.com"
+}
+```
+
+#### **Respuesta Exitosa (200 OK)**
+
+```json
+{
+  "message": "Postulación rechazada con éxito"
+}
+```
+
+#### **Códigos de Estado en Caso de Error**
+
+##### **400 - Solicitud Incorrecta**
+
+```json
+{
+  "error": "Faltan campos obligatorios o el formato es incorrecto"
+}
+```
+
+##### **500 - Error Interno del Servidor**
+
+```json
+{
+  "error": "Error interno al procesar la postulación"
 }
 ```

@@ -4,6 +4,7 @@
 const express = require("express");
 const upload = require("../middlewares/upload.middleware.js");
 const SedeController = require("../controllers/sede/sede.controller.js");
+const PdfController = require("../controllers/pdf.controller.js");
 const tokenMiddleware = require("../middlewares/token.middleware");
 
 const router = express.Router();
@@ -14,6 +15,8 @@ router.post("/registro", upload.single("convocatoria_firmada"), SedeController.r
 router.post("/:id/aceptar", SedeController.aceptarSede);
 router.post("/:id/rechazar", SedeController.rechazarSede);
 router.get("/:id/detalles", SedeController.obtenerDetallesUnaSede);
-router.get("/:id/convocatoria", tokenMiddleware, SedeController.descargarConvocatoria);
+router.post("/:id_aplicante/postulaciones/aceptar", SedeController.aceptarPostulacion);
+router.post("/:id_aplicante/postulaciones/rechazar", SedeController.rechazarPostulacion);
+router.get("/:id/descargar-convocatoria-sede", tokenMiddleware, PdfController.descargarConvocatoriaSede);
 
 module.exports = router;

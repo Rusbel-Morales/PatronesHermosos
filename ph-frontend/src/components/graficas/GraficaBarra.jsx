@@ -26,15 +26,21 @@ const BarChart = ({ topSedes }) => {
 
   const options = {
     responsive: true,
+    maintainAspectRatio: false,
     plugins: {
       legend: {
         position: "bottom",
       },
     },
+    layout: {
+      padding: {
+        bottom: 18, // añade espacio extra para etiquetas
+      },
+    },
   };
 
   return (
-    <Box w="lg" bg="white" borderRadius="md" boxShadow="md">
+    <Box h="40vh" w="50vh" bg="white" borderRadius="md" boxShadow="md" overflow="hidden">
       <Heading size="md" mb="8" ml="2">Top 5 Sedes Con Más Participantes</Heading>
       <Bar data={data} options={options} />
     </Box>

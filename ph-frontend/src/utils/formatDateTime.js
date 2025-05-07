@@ -1,3 +1,6 @@
+import { format } from "date-fns";
+import { es } from "date-fns/locale";
+
 /**
  * Formatea una fecha en formato "dd/mm/aaaa, hh:mm"
  * @param {string | Date} fecha Fecha en formato ISO o Date object
@@ -16,4 +19,29 @@ export function formatDateTime(fecha) {
 		minute: "2-digit",
 		hour12: false,
 	});
+}
+
+export function formatearFecha(fecha) {
+	if (!fecha) return "";
+
+    const [year, month, day] = fecha.split("-");
+    return `${day}/${month}/${year}`;
+}
+
+export function convertDateToSpanish(fecha) {
+    if (!fecha) return "";
+
+	// Obtener los elementos de la fecha
+	const [startYear, startMonth, startDay] = fecha.split("-");
+	const [endYear, endMonth, endDay] = fecha.split("-");
+
+	// Crear un nuevo objeto Date con los elementos de la fecha en formato UTC
+	const startDate = new Date(+startYear, +startMonth - 1, +startDay);
+	const endDate = new Date(+endYear, +endMonth - 1, +endDay + 5);
+
+    // Formatear la fecha en español
+	const formattedStartDate = format(startDate, "dd 'de' MMMM", { locale: es });
+	const formattedEndDate = format(endDate, "dd 'de' MMMM 'de' yyyy", { locale: es });
+
+	return `${formattedStartDate} al ${formattedEndDate}`
 }

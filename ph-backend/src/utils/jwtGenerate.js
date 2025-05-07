@@ -3,11 +3,10 @@ const dotenv = require("dotenv");
 
 dotenv.config();
 
-function jwtGenerate(username, password) {
-    
+function jwtGenerate(username, password, rol, tokenTable) {
     // Generate a JWT token with the username and password
     return jwt.sign(
-        { username, password }, 
+        { username, password, rol, tokenTable }, 
         process.env.JWT_SECRET_KEY, 
     );
 };

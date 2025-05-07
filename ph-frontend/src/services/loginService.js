@@ -14,12 +14,12 @@ import apiConfig from "@/config/apiConfig.js";
  */
 export const postLogin = async (username, password) => {
 	try {
-		const response = await axios.post(`${apiConfig.baseUrl}/coordGeneral/login`, {
+		const response = await axios.post(`${apiConfig.baseUrl}/administration/login`, {
 			username,
 			password,
 		});
-		return response.data.token;
+		return response.data;
 	} catch (error) {
-		throw new Error("Error al iniciar sesión");
+		throw new Error("Error al iniciar sesión " + error.message);
 	}
 }

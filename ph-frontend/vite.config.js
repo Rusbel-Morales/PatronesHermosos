@@ -10,4 +10,8 @@ export default defineConfig({
       '@': path.resolve(__dirname, './src'),
     },
   },
+  server: {
+    host: true, // permite que se escuche en la IP de red
+    port: 5173,
+  },
 })

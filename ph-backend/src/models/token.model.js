@@ -1,24 +1,17 @@
 // token.model.js
-
 const supabase = require('../../config/database');
 
 const TokenModel = {
-	async verificarToken(token) {
-		const { data, error } = await supabase
-			.from("token")
+	async verificarToken(tokenTable, token) {
+		const { _, error } = await supabase
+			.from(tokenTable)
 			.select("token")
 			.eq("token", token)
 			.single();
 
 		if (error) {
-			if (error.statusCode === 404) {
-				throw new Error("Token de sesión requerido");
-			} else {
-				throw new Error("Error al verificar el token: " + error.message);
-			}
+			throw new Error("Error al verificar el token: " + error.message);
 		}
-
-		return data;
 	}
 };
 

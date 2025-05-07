@@ -33,15 +33,22 @@ const PieChart = ({ sedesEstado }) => {
 
   const options = {
     responsive: true,
+    maintainAspectRatio: false,
     plugins: {
       legend: {
         position: "bottom",
       },
     },
+    layout: {
+      padding: {
+        bottom: 16, // añade espacio extra para etiquetas
+      },
+    },
+    
   };
 
   return (
-    <Box w="xs" bg="white"  borderRadius="md" boxShadow="md">
+    <Box  bg="white"  borderRadius="md" boxShadow="md" h="40vh" w="50vh" p="4" overflow="hidden">
       <Heading size="md" mb="4" ml="2">Sedes Aprobadas/Pendientes</Heading>
       <Pie data={data} options={options} />
     </Box>

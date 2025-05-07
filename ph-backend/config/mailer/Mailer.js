@@ -5,8 +5,8 @@ class Mailer {
     this.mailerBehaviour = mailerBehaviour;
   }
 
-  async sendEmail(nombre, correo) {
-    return this.mailerBehaviour.sendEmail(nombre, correo);
+  async sendEmail(data) {
+    return this.mailerBehaviour.sendEmail(data);
   }
 }
 

@@ -32,3 +32,20 @@ export const createParticipante = async (participanteData) => {
 
 	return response.data;
 };
+
+
+export const getParticipante = async (id) => {
+	try {
+	  const part = await axios.get(`${apiConfig.baseUrl}/participantes/listar?id_sede=${id}`);
+	  return part.data;
+	} catch (error) {
+	  console.error("Error en servicio SedesDetalles:", error);
+	  
+	  // Si el servidor devuelve un error con mensaje, lo propagamos
+	  if (error.response && error.response.data && error.response.data.error) {
+		throw new Error(error.response.data.error);
+	  }
+	  
+	  throw new Error("Ocurrió un error al obtener los detalles de las sedes");
+	}
+  };

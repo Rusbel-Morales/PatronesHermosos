@@ -4,7 +4,9 @@ import { FaArrowUp, FaInfoCircle } from "react-icons/fa";
 import { fetchSedesPersonal, createPersonal } from "@/services/personalService.js";
 import { calcularProgresoPersonal } from '@/utils/personalProgreso.js';
 import { escolaridades, idiomas, niveles, roles } from "@/utils/optionsCollections.js";
-import PersonalPreview from "../../components/previews/PersonalPreview";
+import ColaboradoraFormPreview from "../../components/form_previews/ColaboradoraFormPreview.jsx";
+import SuccessModal from "../../components/modals/SuccessModal";
+import ErrorModal from "../../components/modals/ErrorModal";
 /**
  * @typedef {Object} PersonalFormData
  * @property {{ nombre: string, correo: string, universidad_origen: string, carrera: string, idioma_preferencia: string, nivel_preferencia: string, rol_preferencia: string }} personal
@@ -40,6 +42,9 @@ const PersonalForm = ({ onSubmit, setProgress }) => {
 	const [fileName, setFileName] = useState("");
 	const [fileURL, setFileURL] = useState(null);
 	const [showPreview, setShowPreview] = useState(false);
+	const [isSuccessModalOpen, setIsSuccessModalOpen] = useState(false);
+	const [isErrorModalOpen, setIsErrorModalOpen] = useState(false);
+	
 
 	const [sedesCollection, setSedesCollection] = useState(
 		createListCollection({ items: [] })
@@ -104,14 +109,16 @@ const PersonalForm = ({ onSubmit, setProgress }) => {
 				sede: formData.sede,
 			});
 			console.log("✅ Registro exitoso:", response);
+			setIsSuccessModalOpen(true);
 		} catch (error) {
 			console.error("❌ Error al registrar:", error);
+			setIsErrorModalOpen(true);
 		}
 	};
 
 	return (
 		<form onSubmit={handleSubmit}>
-			<Stack align="center" mt="4">
+			<Stack align="center" w="100vw" h="45vh" mt="4">
 				<Card.Root maxW="6xl" w="full" bg="gray.100" pl="10" pr="10">
 					{!showPreview ? (
 						<>
@@ -392,7 +399,7 @@ const PersonalForm = ({ onSubmit, setProgress }) => {
 							</Card.Footer>
 						</>
 					) : (
-						<PersonalPreview
+						<ColaboradoraFormPreview
 							formData={formData}
 							fileURL={fileURL}
 							fileName={fileName}
@@ -401,6 +408,18 @@ const PersonalForm = ({ onSubmit, setProgress }) => {
 					)}
 				</Card.Root>
 			</Stack>
+
+			<SuccessModal
+									isOpen={isSuccessModalOpen}
+									onClose={() => setIsSuccessModalOpen(false)}
+									message="Te has registrado correctamente"
+									/>
+			
+						<ErrorModal
+									isOpen={isErrorModalOpen}
+									onClose={() => setIsErrorModalOpen(false)}
+									message="Ocurrio un error al registrar, por favor intentar nuevamente"
+									/>
 		</form>
 	);
 };
