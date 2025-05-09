@@ -50,7 +50,7 @@ Mis responsabilidades incluyen:
 ## 👥 Autores del proyecto
 
 - **Rusbel Alejandro Morales Méndez** – [GitHub](#) *(este perfil)*
-- **Diego Javier Solórzano Trinidad** – [GitHub](#)
-- **Jonathan Armando Arredondo Hernández** – [GitHub](#)
-- **Gadiro Cano Sánchez** – [GitHub](#)
-- **Pablo André Coca Murillo** – [GitHub](#)
+- **Diego Javier Solórzano Trinidad** – [GitHub](https://github.com/Diegosoltri)
+- **Jonathan Armando Arredondo Hernández** – [GitHub](https://github.com/jonar12)
+- **Gadiro Cano Sánchez** – [GitHub](https://github.com/GadiroC)
+- **Pablo André Coca Murillo** – [GitHub](https://github.com/PACM-an)
